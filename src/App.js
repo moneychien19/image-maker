@@ -4,6 +4,19 @@ import { DownloadImage } from "./components/DownloadImage";
 import { DisplayBlock } from "./components/DisplayBlock";
 import { Form } from "./components/Form";
 
+// ref: https://stackoverflow.com/a/43358515/21562825
+function dataURLtoFile(dataurl, filename) {
+  var arr = dataurl.split(","),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]),
+    n = bstr.length,
+    u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+}
+
 function App() {
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
@@ -16,6 +29,13 @@ function App() {
     const canvas = canvasRef.current;
     let img = new Image();
     img.src = canvas.toDataURL("image/png");
+
+    const { size } = dataURLtoFile(
+      canvas.toDataURL("image/png"),
+      `${fileName ?? "image"}.png`
+    );
+    console.log(size);
+
     let a = document.createElement("a");
     a.href = img.src;
     a.download = `${fileName ?? "image"}.png`;
